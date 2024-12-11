@@ -104,9 +104,8 @@ namespace BK7231Flasher
 	public static int FLASH_ID_GD25WQ16E=0x001565c8;
 	public static int FLASH_ID_GD25WQ32E=0x001665c8;
 	public static int FLASH_ID_GD25WQ64E=0x001765c8;
-	public static int FLASH_ID_Puya25Q16HBK=0x152085:
-		
-	public static int FLASH_ID_NA=0x001640c8; //GD flash
+	public static int FLASH_ID_Puya25Q16HBK=0x152085:		
+	public static int FLASH_ID_GD25Q32=0x001640c8; //GD flash
 		
         
         public static int BFD(int v, int bs, int bl)
@@ -176,9 +175,8 @@ namespace BK7231Flasher
 	        addFlash(new BKFlash(FLASH_ID_GD25WQ16E, "GD25WQ16E", "GD", 16 * 1024 * 1024, 2, 0x00, 0x07, BIT(14) | BFD(0x1f, 2, 5), 2, 5,    new byte[] {0x05, 0x35, 0xff, 0xff},   new byte[] {0x01, 0xff, 0xff, 0xff}));
 	        addFlash(new BKFlash(FLASH_ID_GD25WQ32E, "GD25WQ32E", "GD", 32 * 1024 * 1024, 2, 0x00, 0x07, BIT(14) | BFD(0x1f, 2, 5), 2, 5,    new byte[] {0x05, 0x35, 0xff, 0xff},   new byte[] {0x01, 0xff, 0xff, 0xff}));
 	        addFlash(new BKFlash(FLASH_ID_GD25WQ64E, "GD25WQ64E", "GD", 64 * 1024 * 1024, 2, 0x00, 0x07, BIT(14) | BFD(0x1f, 2, 5), 2, 5,    new byte[] {0x05, 0x35, 0xff, 0xff},   new byte[] {0x01, 0xff, 0xff, 0xff}));
-	        addFlash(new BKFlash(FLASH_ID_Puya25Q16HBK, "P25Q16HBK", "Puya", 16 * 1024 * 1024, 2, 0x00, 0x07, BIT(14) | BFD(0x1f, 2, 5), 2, 5, new byte[] { 0x05, 0x35, 0xff, 0xff }, new byte[] { 0x01, 0x31, 0xff, 0xff }));
-				
-		addFlash(new BKFlash(FLASH_ID_NA, "NA_NA", "NA", 32 * 1024 * 1024, 2, 0x00, 0x07, BIT(14) | BFD(0x1f, 2, 5), 2, 5,    new byte[] {0x05, 0x35, 0xff, 0xff},   new byte[] {0x01, 0xff, 0xff, 0xff}));
+	        addFlash(new BKFlash(FLASH_ID_Puya25Q16HBK, "P25Q16HBK", "Puya", 16 * 1024 * 1024, 2, 0x00, 0x07, BIT(14) | BFD(0x1f, 2, 5), 2, 5, new byte[] { 0x05, 0x35, 0xff, 0xff }, new byte[] { 0x01, 0x31, 0xff, 0xff }));				
+		addFlash(new BKFlash(FLASH_ID_GD25Q32, "GD25Q32", "NA", 32 * 1024 * 1024, 2, 0x00, 0x07, BIT(14) | BFD(0x1f, 2, 5), 2, 5,    new byte[] {0x05, 0x35, 0xff, 0xff},   new byte[] {0x01, 0xff, 0xff, 0xff}));
         }
     }
 }
