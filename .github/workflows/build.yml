@@ -24,7 +24,7 @@ jobs:
       uses: NuGet/setup-nuget@v2
 
     - name: Restore NuGet packages
-      run: nuget restore BK7231Flasher/BK7231Flasher.csproj
+      run: nuget restore BK7231Flasher/BK7231Flasher.csproj -SolutionDirectory .
 
     - name: Build the project
       run: msbuild BK7231Flasher/BK7231Flasher.csproj /p:Configuration=Release
