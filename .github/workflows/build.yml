@@ -65,15 +65,22 @@ jobs:
         with:
           name: BuildOutput
 
+      - name: Recreate Directory Structure
+        run: |
+          echo "Recreating BuildOutput directory..."
+          mkdir -p BuildOutput/Release
+          move *.exe BuildOutput/Release/
+          move *.dll BuildOutput/Release/
+
       - name: Debug Downloaded Artifacts
         run: |
-          echo "Downloaded artifacts:"
-          dir BuildOutput
+          echo "Downloaded artifacts in BuildOutput/Release:"
+          dir BuildOutput/Release
 
       - name: Create ZIP File
         run: |
           mkdir release
-          powershell Compress-Archive -Path "BuildOutput\*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
+          powershell Compress-Archive -Path "BuildOutput\Release\*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
 
       - name: Create GitHub Release
         id: create_release
