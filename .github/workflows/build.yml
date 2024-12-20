@@ -39,7 +39,7 @@ jobs:
           dir BuildOutput\Release
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BuildOutput
           path: |
@@ -80,7 +80,7 @@ jobs:
       - name: Create ZIP File
         run: |
           mkdir release
-          powershell Compress-Archive -Path "BuildOutput\Release\*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
+          powershell Compress-Archive -Path "BuildOutput\Release\*" -DestinationPath "release\BK7231GUIFlashTool.zip"
 
       - name: Create GitHub Release
         id: create_release
@@ -102,6 +102,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
-          asset_name: "BK7231GUIFlashTool-v${{ github.run_number }}.zip"
+          asset_path: "release\BK7231GUIFlashTool.zip"
+          asset_name: "BK7231GUIFlashTool.zip"
           asset_content_type: application/zip
