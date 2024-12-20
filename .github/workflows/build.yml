@@ -43,9 +43,14 @@ jobs:
         with:
           name: BuildOutput
           path: |
-            BuildOutput/Release/*.exe
-            BuildOutput/Release/*.dll
+            BK7231Flasher/BuildOutput/Release/*.exe
+            BK7231Flasher/BuildOutput/Release/*.dll
           if-no-files-found: warn
+
+      - name: Debug Build Output Directory
+        run: |
+          echo "Contents of BuildOutput/Release:"
+          dir BK7231Flasher/BuildOutput/Release
 
   release:
     needs: build
