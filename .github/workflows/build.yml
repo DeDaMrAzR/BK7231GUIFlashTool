@@ -24,18 +24,18 @@ jobs:
       uses: NuGet/setup-nuget@v2
 
     - name: Restore NuGet packages
-      run: nuget restore BK7231GUIFlashTool.sln
+      run: nuget restore BK7231Flasher/BK7231Flasher.csproj
 
-    - name: Build the solution
-      run: msbuild BK7231GUIFlashTool.sln /p:Configuration=Release
+    - name: Build the project
+      run: msbuild BK7231Flasher/BK7231Flasher.csproj /p:Configuration=Release
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: BuildOutput
         path: |
-          **\bin\Release\
-
+          BK7231Flasher/bin/Release/
+          
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -65,7 +65,7 @@ jobs:
     - name: Zip Build Artifacts
       run: |
         mkdir release
-        tar -czvf release/BK7231GUIFlashTool-v${{ github.run_number }}.tar.gz -C **/bin/Release .
+        powershell Compress-Archive -Path BK7231Flasher\bin\Release\* -DestinationPath release\BK7231GUIFlashTool-v${{ github.run_number }}.zip
 
     - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
@@ -73,6 +73,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release/BK7231GUIFlashTool-v${{ github.run_number }}.tar.gz
-        asset_name: BK7231GUIFlashTool-v${{ github.run_number }}.tar.gz
-        asset_content_type: application/gzip
+        asset_path: release/BK7231GUIFlashTool-v${{ github.run_number }}.zip
+        asset_name: BK7231GUIFlashTool-v${{ github.run_number }}.zip
+        asset_content_type: application/zip
