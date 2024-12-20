@@ -29,17 +29,19 @@ jobs:
       - name: Build the project
         run: msbuild BK7231Flasher/BK7231Flasher.csproj /p:Configuration=Release /p:OutDir=BK7231Flasher\bin\Release\
 
+      - name: Debug Build Output
+        run: |
+          echo "Checking MSBuild output directories..."
+          dir BK7231Flasher
+          dir BK7231Flasher\bin
+          dir BK7231Flasher\bin\Release
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: BuildOutput
           path: |
             BK7231Flasher/bin/Release/
-
-      - name: Debug Uploaded Artifacts
-        run: |
-          echo "Uploaded artifacts:"
-          ls BK7231Flasher/bin/Release/
 
   release:
     needs: build
@@ -57,7 +59,7 @@ jobs:
       - name: Debug Downloaded Artifacts
         run: |
           echo "Downloaded artifacts:"
-          ls BK7231Flasher/bin/Release/
+          dir BK7231Flasher/bin/Release/
 
       - name: Create ZIP File
         run: |
