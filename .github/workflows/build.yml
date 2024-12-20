@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up MSBuild
       uses: microsoft/setup-msbuild@v1
@@ -35,13 +35,14 @@ jobs:
         name: BuildOutput
         path: |
           BK7231Flasher/bin/Release/
-          
+
   release:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Download Build Artifacts
       uses: actions/download-artifact@v3
@@ -50,8 +51,8 @@ jobs:
 
     - name: Create ZIP File
       run: |
-        mkdir -p release
-        zip -r release/BK7231GUIFlashTool-v${{ github.run_number }}.zip BK7231Flasher/bin/Release/
+        mkdir release
+        powershell Compress-Archive -Path BK7231Flasher\bin\Release\* -DestinationPath release\BK7231GUIFlashTool-v${{ github.run_number }}.zip
 
     - name: Create GitHub Release
       id: create_release
@@ -68,11 +69,11 @@ jobs:
         prerelease: false
 
     - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
+      uses: actions/upload-release-asset@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release/BK7231GUIFlashTool-v${{ github.run_number }}.zip
+        asset_path: release\BK7231GUIFlashTool-v${{ github.run_number }}.zip
         asset_name: BK7231GUIFlashTool-v${{ github.run_number }}.zip
         asset_content_type: application/zip
