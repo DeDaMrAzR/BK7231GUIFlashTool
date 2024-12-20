@@ -41,7 +41,7 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BuildOutput
+          name: BK7231GUIFlashTool
           path: |
             BK7231Flasher/BuildOutput/Release/*.exe
             BK7231Flasher/BuildOutput/Release/*.dll
@@ -63,7 +63,7 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: BuildOutput
+          name: BK7231GUIFlashTool
 
       - name: Recreate Directory Structure
         run: |
