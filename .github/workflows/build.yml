@@ -68,12 +68,12 @@ jobs:
       - name: Debug Downloaded Artifacts
         run: |
           echo "Downloaded artifacts:"
-          dir BuildOutput/Release
+          dir BuildOutput
 
       - name: Create ZIP File
         run: |
           mkdir release
-          powershell Compress-Archive -Path "BuildOutput\Release\*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
+          powershell Compress-Archive -Path "BuildOutput\*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
 
       - name: Create GitHub Release
         id: create_release
