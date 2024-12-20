@@ -77,19 +77,18 @@ jobs:
         run: |
           mkdir release
           powershell Compress-Archive -Path "BuildOutput\Release\*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
+          
       - name: Create GitHub Release
-        id: create_release
-        uses: elgohr/Github-Release-Action@v5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
-          release_name: BK7231GUIFlashTool v${{ github.run_number }}
+          name: BK7231GUIFlashTool v${{ github.run_number }}
           body: |
             Automated release for BK7231GUIFlashTool.
             Includes the latest .exe and .dll files.
           draft: false
           prerelease: false
+          files: release/BK7231GUIFlashTool-v${{ github.run_number }}.zip
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
