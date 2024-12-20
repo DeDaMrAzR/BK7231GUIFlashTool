@@ -1,4 +1,4 @@
-name: Build, Version, and Release BK7231GUIFlashTool
+name: Build and Release BK7231GUIFlashTool
 
 on:
   push:
@@ -43,7 +43,7 @@ jobs:
 
   release:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -58,13 +58,18 @@ jobs:
         run: |
           echo "Recreating BuildOutput directory..."
           mkdir -p BuildOutput/Release
-          mv *.exe BuildOutput/Release/
-          mv *.dll BuildOutput/Release/
+          move *.exe BuildOutput/Release/
+          move *.dll BuildOutput/Release/
 
       - name: Create ZIP File
         run: |
           mkdir release
-          zip -r release/BK7231GUIFlashTool-v${{ github.run_number }}.zip BuildOutput/Release
+          powershell Compress-Archive -Path "BuildOutput/Release/*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
       - name: Run Semantic Release
         uses: cycjimmy/semantic-release-action@v4
