@@ -26,6 +26,9 @@ jobs:
       - name: Restore NuGet packages
         run: nuget restore BK7231Flasher/BK7231Flasher.csproj -SolutionDirectory .
 
+      - name: Create Output Directory
+        run: mkdir -p BuildOutput/Release
+
       - name: Build the project
         run: msbuild BK7231Flasher/BK7231Flasher.csproj /p:Configuration=Release /p:OutDir=BuildOutput\Release\
 
