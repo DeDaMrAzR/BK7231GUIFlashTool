@@ -29,12 +29,17 @@ jobs:
       - name: Build the project
         run: msbuild BK7231Flasher/BK7231Flasher.csproj /p:Configuration=Release /p:OutDir=BK7231Flasher\bin\Release\
 
-      - name: Debug Build Output
+      - name: Debug MSBuild Output
         run: |
-          echo "Checking MSBuild output directories..."
+          echo "Checking MSBuild output..."
           dir BK7231Flasher
           dir BK7231Flasher\bin
           dir BK7231Flasher\bin\Release
+
+      - name: Debug Intermediate Output
+        run: |
+          dir BK7231Flasher\obj
+          dir BK7231Flasher\obj\Release
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
