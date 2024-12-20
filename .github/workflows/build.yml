@@ -37,11 +37,10 @@ jobs:
           echo "Checking output directory..."
           dir BuildOutput
           dir BuildOutput\Release
-
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: BK7231GUIFlashTool
+          name: BuildOutput
           path: |
             BK7231Flasher/BuildOutput/Release/*.exe
             BK7231Flasher/BuildOutput/Release/*.dll
@@ -51,7 +50,6 @@ jobs:
         run: |
           echo "Contents of BuildOutput/Release:"
           dir BK7231Flasher/BuildOutput/Release
-
   release:
     needs: build
     runs-on: windows-latest
@@ -63,7 +61,7 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: BK7231GUIFlashTool
+          name: BuildOutput
 
       - name: Recreate Directory Structure
         run: |
@@ -71,17 +69,14 @@ jobs:
           mkdir -p BuildOutput/Release
           move *.exe BuildOutput/Release/
           move *.dll BuildOutput/Release/
-
       - name: Debug Downloaded Artifacts
         run: |
           echo "Downloaded artifacts in BuildOutput/Release:"
           dir BuildOutput/Release
-
       - name: Create ZIP File
         run: |
           mkdir release
-          powershell Compress-Archive -Path "BuildOutput\Release\*" -DestinationPath "release\BK7231GUIFlashTool.zip"
-
+          powershell Compress-Archive -Path "BuildOutput\Release\*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
@@ -102,6 +97,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "release/BK7231GUIFlashTool.zip"
-          asset_name: "BK7231GUIFlashTool.zip"
+          asset_path: "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
+          asset_name: "BK7231GUIFlashTool-v${{ github.run_number }}.zip"
           asset_content_type: application/zip
