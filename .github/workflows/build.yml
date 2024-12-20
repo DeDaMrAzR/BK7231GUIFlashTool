@@ -38,9 +38,9 @@ jobs:
           dir BuildOutput
           dir BuildOutput\Release
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: BuildOutput
+          name: BK7231GUIFlashTool
           path: |
             BK7231Flasher/BuildOutput/Release/*.exe
             BK7231Flasher/BuildOutput/Release/*.dll
@@ -59,9 +59,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download Build Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: BuildOutput
+          name: BK7231GUIFlashTool
 
       - name: Recreate Directory Structure
         run: |
@@ -79,7 +79,7 @@ jobs:
           powershell Compress-Archive -Path "BuildOutput\Release\*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: elgohr/Github-Release-Action@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
