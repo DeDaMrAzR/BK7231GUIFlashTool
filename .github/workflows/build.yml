@@ -1,4 +1,4 @@
-name: Build BK7231Flasher
+name: Build and Release BK7231GUIFlashTool
 
 on:
   push:
@@ -7,26 +7,72 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
+    - name: Set up MSBuild
+      uses: microsoft/setup-msbuild@v1
 
-      - name: Restore NuGet packages
-        run: nuget restore BK7231Flasher.sln
+    - name: Install NuGet
+      uses: NuGet/setup-nuget@v2
 
-      - name: Build solution
-        run: msbuild BK7231Flasher.sln /p:Configuration=Release
+    - name: Restore NuGet packages
+      run: nuget restore BK7231GUIFlashTool.sln
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BK7231Flasher-Release
-          path: BK7231Flasher/bin/Release
+    - name: Build the solution
+      run: msbuild BK7231GUIFlashTool.sln /p:Configuration=Release
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: BuildOutput
+        path: |
+          **\bin\Release\
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: BuildOutput
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: BK7231GUIFlashTool v${{ github.run_number }}
+        body: |
+          Automated release for BK7231GUIFlashTool.
+          Includes the latest built binaries.
+        draft: false
+        prerelease: false
+
+    - name: Zip Build Artifacts
+      run: |
+        mkdir release
+        tar -czvf release/BK7231GUIFlashTool-v${{ github.run_number }}.tar.gz -C **/bin/Release .
+
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: release/BK7231GUIFlashTool-v${{ github.run_number }}.tar.gz
+        asset_name: BK7231GUIFlashTool-v${{ github.run_number }}.tar.gz
+        asset_content_type: application/gzip
