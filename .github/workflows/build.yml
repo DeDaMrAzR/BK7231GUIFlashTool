@@ -1,4 +1,4 @@
-name: Build and Release BK7231GUIFlashTool
+name: Build, Version, and Release BK7231GUIFlashTool
 
 on:
   push:
@@ -32,12 +32,6 @@ jobs:
       - name: Build the project
         run: msbuild BK7231Flasher/BK7231Flasher.csproj /p:Configuration=Release /p:OutDir=BuildOutput\Release\
 
-      - name: Debug Build Output
-        run: |
-          echo "Checking output directory..."
-          dir BuildOutput
-          dir BuildOutput\Release
-
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -47,14 +41,9 @@ jobs:
             BK7231Flasher/BuildOutput/Release/*.dll
           if-no-files-found: warn
 
-      - name: Debug Build Output Directory
-        run: |
-          echo "Contents of BuildOutput/Release:"
-          dir BK7231Flasher/BuildOutput/Release
-
   release:
     needs: build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -69,27 +58,20 @@ jobs:
         run: |
           echo "Recreating BuildOutput directory..."
           mkdir -p BuildOutput/Release
-          move *.exe BuildOutput/Release/
-          move *.dll BuildOutput/Release/
-
-      - name: Debug Downloaded Artifacts
-        run: |
-          echo "Downloaded artifacts in BuildOutput/Release:"
-          dir BuildOutput/Release
+          mv *.exe BuildOutput/Release/
+          mv *.dll BuildOutput/Release/
 
       - name: Create ZIP File
         run: |
           mkdir release
-          powershell Compress-Archive -Path "BuildOutput/Release/*" -DestinationPath "release/BK7231GUIFlashTool-v${{ github.run_number }}.zip"
+          zip -r release/BK7231GUIFlashTool-v${{ github.run_number }}.zip BuildOutput/Release
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Run Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ github.run_number }}
-          name: BK7231GUIFlashTool v${{ github.run_number }}
-          body: |
-            Automated release for BK7231GUIFlashTool.
-            Includes the latest .exe and .dll files.
-          draft: false
-          prerelease: false
-          files: release/BK7231GUIFlashTool-v${{ github.run_number }}.zip
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/github
+          debug: true
