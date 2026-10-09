@@ -19,6 +19,11 @@ namespace BK7231Flasher
         private RichTextBox textBoxTerminalLog;
         private TextBox textBoxTerminalCommand;
         private SerialPort terminalSerialPort;
+        private readonly object terminalReceiveLock = new object();
+        private readonly StringBuilder terminalPreConnectText = new StringBuilder();
+        private bool terminalConnectionAnnounced;
+        private bool terminalPendingCarriageReturn;
+        private bool terminalPreviousWasLineBreak;
 
         private void InitializeTerminalTab()
         {
@@ -278,6 +283,13 @@ namespace BK7231Flasher
                 ReadTimeout = 500,
                 WriteTimeout = 500,
             };
+            lock (terminalReceiveLock)
+            {
+                terminalConnectionAnnounced = false;
+                terminalPendingCarriageReturn = false;
+                terminalPreviousWasLineBreak = false;
+                terminalPreConnectText.Clear();
+            }
             port.DataReceived += TerminalSerialPort_DataReceived;
             terminalSerialPort = port;
 
@@ -286,6 +298,7 @@ namespace BK7231Flasher
                 port.Open();
                 SetTerminalConnectedState(true);
                 AppendTerminalLine("Connected to " + portName + " at " + baudRate + " baud.", Color.Green);
+                FlushTerminalPreConnectText();
                 textBoxTerminalCommand.Focus();
             }
             catch (Exception ex)
@@ -307,7 +320,7 @@ namespace BK7231Flasher
             {
                 string received = port.ReadExisting();
                 if (!string.IsNullOrEmpty(received))
-                    AppendTerminalText(received, Color.Black);
+                    AppendTerminalReceivedText(received);
             }
             catch (Exception ex)
             {
@@ -391,6 +404,14 @@ namespace BK7231Flasher
             SerialPort port = terminalSerialPort;
             terminalSerialPort = null;
 
+            lock (terminalReceiveLock)
+            {
+                terminalConnectionAnnounced = false;
+                terminalPendingCarriageReturn = false;
+                terminalPreviousWasLineBreak = false;
+                terminalPreConnectText.Clear();
+            }
+
             if (port != null)
             {
                 port.DataReceived -= TerminalSerialPort_DataReceived;
@@ -434,6 +455,85 @@ namespace BK7231Flasher
         private void AppendTerminalLine(string text, Color color)
         {
             AppendTerminalText(text + Environment.NewLine, color);
+        }
+
+        private void AppendTerminalReceivedText(string text)
+        {
+            string normalized;
+            lock (terminalReceiveLock)
+            {
+                if (!terminalConnectionAnnounced)
+                {
+                    terminalPreConnectText.Append(text);
+                    return;
+                }
+                normalized = NormalizeTerminalLineEndings(text);
+            }
+
+            if (normalized.Length > 0)
+                AppendTerminalText(normalized, Color.Black);
+        }
+
+        private void FlushTerminalPreConnectText()
+        {
+            string normalized;
+            lock (terminalReceiveLock)
+            {
+                terminalConnectionAnnounced = true;
+                normalized = NormalizeTerminalLineEndings(terminalPreConnectText.ToString());
+                terminalPreConnectText.Clear();
+            }
+
+            if (normalized.Length > 0)
+                AppendTerminalText(normalized, Color.Black);
+        }
+
+        private string NormalizeTerminalLineEndings(string text)
+        {
+            StringBuilder normalized = new StringBuilder(text.Length + 16);
+            int index = 0;
+
+            if (terminalPendingCarriageReturn)
+            {
+                AppendNormalizedTerminalLineBreak(normalized);
+                terminalPendingCarriageReturn = false;
+                if (text.Length > 0 && text[0] == '\n')
+                    index = 1;
+            }
+
+            for (; index < text.Length; index++)
+            {
+                char value = text[index];
+                if (value == '\r')
+                {
+                    if (index + 1 >= text.Length)
+                    {
+                        terminalPendingCarriageReturn = true;
+                        continue;
+                    }
+                    if (text[index + 1] == '\n')
+                        index++;
+                    AppendNormalizedTerminalLineBreak(normalized);
+                }
+                else if (value == '\n')
+                {
+                    AppendNormalizedTerminalLineBreak(normalized);
+                }
+                else
+                {
+                    normalized.Append(value);
+                    terminalPreviousWasLineBreak = false;
+                }
+            }
+
+            return normalized.ToString();
+        }
+
+        private void AppendNormalizedTerminalLineBreak(StringBuilder normalized)
+        {
+            if (!terminalPreviousWasLineBreak)
+                normalized.Append(Environment.NewLine);
+            terminalPreviousWasLineBreak = true;
         }
 
         private void AppendTerminalText(string text, Color color)
