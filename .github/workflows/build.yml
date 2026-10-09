@@ -41,6 +41,17 @@ jobs:
         shell: pwsh
         run: msbuild BK7231Flasher/BK7231Flasher.csproj /p:Configuration=Release /p:OutDir=BuildOutput\Release\ /p:FLASHERVERSION=$env:FLASHERVERSION
 
+      - name: Set OpenIOT flasher executable name
+        shell: pwsh
+        run: |
+          $outputDirectory = "BK7231Flasher/BuildOutput/Release"
+          $sourceExecutable = Join-Path $outputDirectory "OpenIOT_flasher.exe"
+          $releaseExecutable = Join-Path $outputDirectory "OpenIOTflasher.exe"
+          if (-not (Test-Path -LiteralPath $sourceExecutable)) {
+            throw "Expected build output was not found: $sourceExecutable"
+          }
+          Move-Item -LiteralPath $sourceExecutable -Destination $releaseExecutable
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v6
         with:

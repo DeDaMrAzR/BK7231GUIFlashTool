@@ -158,13 +158,6 @@ namespace BK7231Flasher
             this.label22 = new System.Windows.Forms.Label();
             this.textBoxStartIP = new System.Windows.Forms.TextBox();
             this.label21 = new System.Windows.Forms.Label();
-            this.tabPage7 = new System.Windows.Forms.TabPage();
-            this.label27 = new System.Windows.Forms.Label();
-            this.textBox_cfg_readReplyStyle = new System.Windows.Forms.TextBox();
-            this.textBox_cfg_readTimeOutMultForLoop = new System.Windows.Forms.TextBox();
-            this.label26 = new System.Windows.Forms.Label();
-            this.textBox_cfg_readTimeOutMultForSerialClass = new System.Windows.Forms.TextBox();
-            this.label25 = new System.Windows.Forms.Label();
             this.tabDecryption = new System.Windows.Forms.TabPage();
             this.chkSkipDecrc = new System.Windows.Forms.CheckBox();
             this.btnLoadDefaultNPartitions = new System.Windows.Forms.Button();
@@ -230,7 +223,6 @@ namespace BK7231Flasher
             this.tabPage2.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabPage6.SuspendLayout();
-            this.tabPage7.SuspendLayout();
             this.tabDecryption.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgPartitions)).BeginInit();
             this.tabPage3.SuspendLayout();
@@ -334,7 +326,6 @@ namespace BK7231Flasher
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage6);
-            this.tabControl1.Controls.Add(this.tabPage7);
             this.tabControl1.Controls.Add(this.tabDecryption);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1087,20 +1078,21 @@ namespace BK7231Flasher
             this.label32.TabIndex = 13;
             this.label32.Text = "You can also get binary from OBK device, only Tuya-config section, 72KB, see tuto" +
     "rial:";
-            // 
+            //
             // buttonTuyaConfig_CopyTextToClipBoard
-            // 
-            this.buttonTuyaConfig_CopyTextToClipBoard.Location = new System.Drawing.Point(570, 89);
+            //
+            this.buttonTuyaConfig_CopyTextToClipBoard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonTuyaConfig_CopyTextToClipBoard.Location = new System.Drawing.Point(1230, 92);
             this.buttonTuyaConfig_CopyTextToClipBoard.Name = "buttonTuyaConfig_CopyTextToClipBoard";
             this.buttonTuyaConfig_CopyTextToClipBoard.Size = new System.Drawing.Size(114, 21);
             this.buttonTuyaConfig_CopyTextToClipBoard.TabIndex = 12;
             this.buttonTuyaConfig_CopyTextToClipBoard.Text = "Copy to Clipboard";
             this.buttonTuyaConfig_CopyTextToClipBoard.UseVisualStyleBackColor = true;
             this.buttonTuyaConfig_CopyTextToClipBoard.Click += new System.EventHandler(this.buttonTuyaConfig_CopyTextToClipBoard_Click);
-            // 
+            //
             // buttonTuyaConfig_CopyJSONToClipBoard
-            // 
-            this.buttonTuyaConfig_CopyJSONToClipBoard.Location = new System.Drawing.Point(234, 89);
+            //
+            this.buttonTuyaConfig_CopyJSONToClipBoard.Location = new System.Drawing.Point(558, 92);
             this.buttonTuyaConfig_CopyJSONToClipBoard.Name = "buttonTuyaConfig_CopyJSONToClipBoard";
             this.buttonTuyaConfig_CopyJSONToClipBoard.Size = new System.Drawing.Size(114, 21);
             this.buttonTuyaConfig_CopyJSONToClipBoard.TabIndex = 11;
@@ -1111,7 +1103,7 @@ namespace BK7231Flasher
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(354, 93);
+            this.label18.Location = new System.Drawing.Point(679, 96);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(82, 13);
             this.label18.TabIndex = 10;
@@ -1119,16 +1111,20 @@ namespace BK7231Flasher
             // 
             // textBoxTuyaCFGText
             // 
-            this.textBoxTuyaCFGText.Location = new System.Drawing.Point(354, 113);
+            this.textBoxTuyaCFGText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxTuyaCFGText.Location = new System.Drawing.Point(679, 116);
             this.textBoxTuyaCFGText.Multiline = true;
             this.textBoxTuyaCFGText.Name = "textBoxTuyaCFGText";
-            this.textBoxTuyaCFGText.Size = new System.Drawing.Size(330, 363);
+            this.textBoxTuyaCFGText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBoxTuyaCFGText.Size = new System.Drawing.Size(665, 520);
             this.textBoxTuyaCFGText.TabIndex = 9;
             // 
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(15, 97);
+            this.label17.Location = new System.Drawing.Point(15, 96);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(67, 13);
             this.label17.TabIndex = 8;
@@ -1147,11 +1143,13 @@ namespace BK7231Flasher
             // 
             // textBoxTuyaCFGJSON
             // 
-            this.textBoxTuyaCFGJSON.Location = new System.Drawing.Point(18, 113);
+            this.textBoxTuyaCFGJSON.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.textBoxTuyaCFGJSON.Location = new System.Drawing.Point(18, 116);
             this.textBoxTuyaCFGJSON.Multiline = true;
             this.textBoxTuyaCFGJSON.Name = "textBoxTuyaCFGJSON";
             this.textBoxTuyaCFGJSON.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxTuyaCFGJSON.Size = new System.Drawing.Size(330, 363);
+            this.textBoxTuyaCFGJSON.Size = new System.Drawing.Size(654, 520);
             this.textBoxTuyaCFGJSON.TabIndex = 1;
             // 
             // label16
@@ -1557,74 +1555,6 @@ namespace BK7231Flasher
             this.label21.TabIndex = 0;
             this.label21.Text = "Start IP:";
             // 
-            // tabPage7
-            // 
-            this.tabPage7.Controls.Add(this.label27);
-            this.tabPage7.Controls.Add(this.textBox_cfg_readReplyStyle);
-            this.tabPage7.Controls.Add(this.textBox_cfg_readTimeOutMultForLoop);
-            this.tabPage7.Controls.Add(this.label26);
-            this.tabPage7.Controls.Add(this.textBox_cfg_readTimeOutMultForSerialClass);
-            this.tabPage7.Controls.Add(this.label25);
-            this.tabPage7.Location = new System.Drawing.Point(4, 22);
-            this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(1355, 647);
-            this.tabPage7.TabIndex = 7;
-            this.tabPage7.Text = "UART Timeouts";
-            this.tabPage7.UseVisualStyleBackColor = true;
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(11, 123);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(99, 13);
-            this.label27.TabIndex = 5;
-            this.label27.Text = "cfg_readReplyStyle";
-            // 
-            // textBox_cfg_readReplyStyle
-            // 
-            this.textBox_cfg_readReplyStyle.Location = new System.Drawing.Point(187, 117);
-            this.textBox_cfg_readReplyStyle.Name = "textBox_cfg_readReplyStyle";
-            this.textBox_cfg_readReplyStyle.Size = new System.Drawing.Size(243, 20);
-            this.textBox_cfg_readReplyStyle.TabIndex = 4;
-            this.textBox_cfg_readReplyStyle.Text = "5";
-            this.textBox_cfg_readReplyStyle.TextChanged += new System.EventHandler(this.textBox_cfg_readReplyStyle_TextChanged);
-            // 
-            // textBox_cfg_readTimeOutMultForLoop
-            // 
-            this.textBox_cfg_readTimeOutMultForLoop.Location = new System.Drawing.Point(187, 90);
-            this.textBox_cfg_readTimeOutMultForLoop.Name = "textBox_cfg_readTimeOutMultForLoop";
-            this.textBox_cfg_readTimeOutMultForLoop.Size = new System.Drawing.Size(243, 20);
-            this.textBox_cfg_readTimeOutMultForLoop.TabIndex = 3;
-            this.textBox_cfg_readTimeOutMultForLoop.Text = "5";
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(8, 93);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(148, 13);
-            this.label26.TabIndex = 2;
-            this.label26.Text = "cfg_readTimeOutMultForLoop";
-            // 
-            // textBox_cfg_readTimeOutMultForSerialClass
-            // 
-            this.textBox_cfg_readTimeOutMultForSerialClass.Location = new System.Drawing.Point(187, 66);
-            this.textBox_cfg_readTimeOutMultForSerialClass.Name = "textBox_cfg_readTimeOutMultForSerialClass";
-            this.textBox_cfg_readTimeOutMultForSerialClass.Size = new System.Drawing.Size(243, 20);
-            this.textBox_cfg_readTimeOutMultForSerialClass.TabIndex = 1;
-            this.textBox_cfg_readTimeOutMultForSerialClass.Text = "5";
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(6, 69);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(175, 13);
-            this.label25.TabIndex = 0;
-            this.label25.Text = "cfg_readTimeOutMultForSerialClass";
-            // 
             // tabDecryption
             // 
             this.tabDecryption.Controls.Add(this.chkSkipDecrc);
@@ -1757,9 +1687,9 @@ namespace BK7231Flasher
             this.textBoxDecryptLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxDecryptLog.Location = new System.Drawing.Point(3, 211);
+            this.textBoxDecryptLog.Location = new System.Drawing.Point(7, 211);
             this.textBoxDecryptLog.Name = "textBoxDecryptLog";
-            this.textBoxDecryptLog.Size = new System.Drawing.Size(901, 270);
+            this.textBoxDecryptLog.Size = new System.Drawing.Size(1341, 429);
             this.textBoxDecryptLog.TabIndex = 1;
             this.textBoxDecryptLog.Text = "";
             // 
@@ -2247,8 +2177,6 @@ namespace BK7231Flasher
             this.tabPage5.PerformLayout();
             this.tabPage6.ResumeLayout(false);
             this.tabPage6.PerformLayout();
-            this.tabPage7.ResumeLayout(false);
-            this.tabPage7.PerformLayout();
             this.tabDecryption.ResumeLayout(false);
             this.tabDecryption.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgPartitions)).EndInit();
@@ -2384,13 +2312,6 @@ namespace BK7231Flasher
         private System.Windows.Forms.ProgressBar progressBarIPOperation;
         private System.Windows.Forms.Label labelIPOperationStatus;
         private System.Windows.Forms.Button buttonIPSaveResultToFile;
-        private System.Windows.Forms.TabPage tabPage7;
-        private System.Windows.Forms.TextBox textBox_cfg_readTimeOutMultForSerialClass;
-        private System.Windows.Forms.Label label25;
-        private System.Windows.Forms.TextBox textBox_cfg_readTimeOutMultForLoop;
-        private System.Windows.Forms.Label label26;
-        private System.Windows.Forms.Label label27;
-        private System.Windows.Forms.TextBox textBox_cfg_readReplyStyle;
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.Label labelMassBackupProgress;
         private System.Windows.Forms.Button buttonStartMassBackup;

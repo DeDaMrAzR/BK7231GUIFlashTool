@@ -43,6 +43,8 @@ namespace BK7231Flasher
         const int FLASH_MID_RETRY_DELAY_MS = 200;
         const int ERASE_ATTEMPTS = 5;
         const float FLASH_COMMAND_MIN_TIMEOUT = 0.5f;
+        const int UART_COMMAND_READ_TIMEOUT_MS = 50;
+        const float UART_COMMAND_TIMEOUT_MULTIPLIER = 5.0f;
         const int SET_BAUD_DRAIN_TIMEOUT_MS = 1000;
         const int BEKEN_EFUSE_SIZE = 0x20;
         const int FOUR_BYTE_BEKEN_EFUSE_SIZE = 0x04;
@@ -590,7 +592,7 @@ namespace BK7231Flasher
                 {
                     consumePending();
                 }
-                serial.ReadTimeout = (int)(10*cfg_readTimeOutMultForSerialClass);
+                serial.ReadTimeout = UART_COMMAND_READ_TIMEOUT_MS;
                 if(txbuf != null)
                 {
                     serial.Write(txbuf, 0, txbuf.Length);
@@ -601,60 +603,29 @@ namespace BK7231Flasher
                 timer.Start();
                 List<byte> received = new List<byte>(rxLen);
                 byte[] readBuffer = new byte[Math.Min(Math.Max(rxLen, 256), 4096)];
-                while (timer.Elapsed.TotalSeconds < timeout * cfg_readTimeOutMultForLoop)
+                while (timer.Elapsed.TotalSeconds < timeout * UART_COMMAND_TIMEOUT_MULTIPLIER)
                 {
                     try
                     {
-                        if (cfg_readReplyStyle == 0)
+                        int available = serial.BytesToRead;
+                        if (available > 0)
                         {
-                            //addLog("serial.BytesToRead " + serial.BytesToRead+"");
-                            int available = serial.BytesToRead;
-                            if (available > 0 && (received.Count > 0 || available >= rxLen))
+                            int readNow = serial.Read(readBuffer, 0, Math.Min(readBuffer.Length, available));
+                            for (int i = 0; i < readNow; i++)
                             {
-                                //  addLog("Tries to read!");
-                                int readNow = serial.Read(readBuffer, 0, Math.Min(readBuffer.Length, available));
-                                for (int i = 0; i < readNow; i++)
-                                {
-                                    received.Add(readBuffer[i]);
-                                }
-                                if (bDebugUART)
-                                {
-                                    addLog("Read len: " + received.Count + Environment.NewLine);
-                                }
-                                if (tryExtractResponse(received, rxLen, txbuf, expectedResponseCommand, out byte[] response))
-                                {
-                                    if (bDebugUART)
-                                    {
-                                        addLog("Got UART reply!" + Environment.NewLine);
-                                    }
-                                    return response;
-                                }
+                                received.Add(readBuffer[i]);
                             }
-                        }
-                        else
-                        {
-                            //addLog("serial.BytesToRead " + serial.BytesToRead+"");
-                            int ava = serial.BytesToRead;
-                            if (ava > 0)
+                            if (bDebugUART)
                             {
-                                //  addLog("Tries to read!");
-                                int readNow = serial.Read(readBuffer, 0, Math.Min(readBuffer.Length, ava));
-                                for (int i = 0; i < readNow; i++)
-                                {
-                                    received.Add(readBuffer[i]);
-                                }
+                                addLog("Read len: " + received.Count + Environment.NewLine);
+                            }
+                            if (tryExtractResponse(received, rxLen, txbuf, expectedResponseCommand, out byte[] response))
+                            {
                                 if (bDebugUART)
                                 {
-                                    addLog("Read len: " + received.Count + Environment.NewLine);
+                                    addLog("Got UART reply!" + Environment.NewLine);
                                 }
-                                if (tryExtractResponse(received, rxLen, txbuf, expectedResponseCommand, out byte[] response))
-                                {
-                                    if (bDebugUART)
-                                    {
-                                        addLog("Got UART reply!" + Environment.NewLine);
-                                    }
-                                    return response;
-                                }
+                                return response;
                             }
                         }
                     }

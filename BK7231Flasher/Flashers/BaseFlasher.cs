@@ -85,9 +85,6 @@ namespace BK7231Flasher
     {
         protected ILogListener logger;
         protected string backupName;
-        protected float cfg_readTimeOutMultForSerialClass = 1.0f;
-        protected float cfg_readTimeOutMultForLoop = 1.0f;
-        protected int cfg_readReplyStyle = 0;
         protected bool bOverwriteBootloader = false;
         protected bool bSkipKeyCheck;
         protected bool bIgnoreCRCErr = false;
@@ -346,20 +343,6 @@ namespace BK7231Flasher
         {
             bCustomWriteMode = b;
         }
-        public void setReadTimeOutMultForSerialClass(float f)
-        {
-            this.cfg_readTimeOutMultForSerialClass = f;
-        }
-        public void setReadTimeOutMultForLoop(float f)
-        {
-            this.cfg_readTimeOutMultForLoop = f;
-        }
-        public void setReadReplyStyle(int i)
-        {
-            this.cfg_readReplyStyle = i;
-        }
-
-
         public virtual void doWrite(int startSector, byte[] data)
         {
 

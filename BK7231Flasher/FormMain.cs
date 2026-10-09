@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -780,15 +779,8 @@ namespace BK7231Flasher
             {
                 serialName = "";
             }
-            float.TryParse(textBox_cfg_readTimeOutMultForLoop.Text.Replace(',','.'),  NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out cfg_readTimeOutMultForLoop);
-            float.TryParse(textBox_cfg_readTimeOutMultForSerialClass.Text.Replace(',', '.'), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out cfg_readTimeOutMultForSerialClass);
-            int.TryParse(textBox_cfg_readReplyStyle.Text.Replace(',', '.'), NumberStyles.Integer, CultureInfo.InvariantCulture, out cfg_readReplyStyle);
-
             return true;
         }
-        int cfg_readReplyStyle;
-        float cfg_readTimeOutMultForLoop;
-        float cfg_readTimeOutMultForSerialClass;
         void downloadLatestFor(BKType type)
         {
             FormDownloader fd = new FormDownloader(this, type);
@@ -813,9 +805,6 @@ namespace BK7231Flasher
         {
             flasher = FlasherFactory.Create(curType, cts.Token);
             flasher.setBasic(this, serialName, curType, chosenBaudRate);
-            flasher.setReadReplyStyle(cfg_readReplyStyle);
-            flasher.setReadTimeOutMultForLoop(cfg_readTimeOutMultForLoop);
-            flasher.setReadTimeOutMultForSerialClass(cfg_readTimeOutMultForSerialClass);
             flasher.setOverwriteBootloader(checkBoxOverwriteBootloader.Checked);
             flasher.setSkipKeyCheck(checkBoxSkipKeyCheck.Checked);
             flasher.setIgnoreCRCErr(chkIgnoreCRCErr.Checked);
@@ -2490,11 +2479,6 @@ namespace BK7231Flasher
         }
 
         private void chkIgnoreCRCErr_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox_cfg_readReplyStyle_TextChanged(object sender, EventArgs e)
         {
 
         }
