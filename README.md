@@ -2,7 +2,7 @@
 
 OpenIOT flasher is a simple Windows application that allows you to back up and flash OpenBK/OpenBeken and related Open\* firmware projects to supported IoT chips without extensive programming knowledge. The tool originally focused on Beken BK7231T/BK7231N devices, but the current version supports a wider set of chip and platform modes.
 
-This project is maintained as the OpenIOT fork of the original [BK7231 GUI Flash Tool](https://github.com/openshwprojects/BK7231GUIFlashTool).
+This project is maintained as the OpenIOT fork of the original [BK7231 GUI Flash Tool](https://github.com/openshwprojects/BK7231GUIFlashTool) and all credits belongs to the owner of that repo!!!
 
 Supported GUI-selectable chip/platform modes:
 - Beken UART:
@@ -43,7 +43,7 @@ Supported GUI-selectable chip/platform modes:
   - RTL8721DA (AmebaDp)
   - RTL8720E (AmebaLite)
 - WinnerMicro:
-  - W600 (write only)
+  - W600 (write only atm)
   - W800/W803
 - XRadio:
   - XR806
@@ -119,46 +119,21 @@ No command line and no strange arguments required.
 
 3. Open our flasher:
 
-![image](https://user-images.githubusercontent.com/85486843/210281085-6141160b-df6d-486c-b574-ef784f5cbd56.png)
+<img width="1365" height="707" alt="image" src="https://github.com/user-attachments/assets/ff4efbe7-4bce-4098-a0ea-bf27806a8bbc" />
 
-4. Select proper platform - BK7231T, BK7231N, BK7236, BK7238, BK7252N, etc.
-5. Select your COM port of USB to UART converter
+
+4. Select your COM port of USB to UART converter
+5. Select proper platform
 6. Click "Download latest from Web" to get proper binary file, or place a matching firmware file manually in the `firmwares` directory
 7. Wait for download to finish
 
 ![image](https://user-images.githubusercontent.com/85486843/210281125-a3e25ab2-3144-4e02-a30c-6e135ecefd24.png)
 
-8. Close download window
-9. Click "Backup and flash new"
-10. When the log window is waiting for "Getting bus", do a device reboot/reset. You can do this in two ways, choose one:
-
-    - **Option A:** short CEN to GND for 0.25s (it is tricky to get this right, requires precise timing)
-    - **Option B:** power off and on device (of course, it should not be connected to mains, use your own safe 3.3V power supply that can supply enough current)
-  
-![image](https://user-images.githubusercontent.com/85486843/210281194-27decf09-723e-41f7-8b47-6fe2b6bb4857.png)
-
-11. It will begin reading (it does first backup, then write)
-
-![image](https://user-images.githubusercontent.com/85486843/210281251-cd69ddab-f0ab-4389-8476-0eb33045aa76.png)
-
-12. After reading, it will start the new firmware erase
-
-![image](https://user-images.githubusercontent.com/85486843/210281467-10129860-61da-4420-a9aa-9910f0e57099.png)
-
-13. And then, automatically, write:
-
-![image](https://user-images.githubusercontent.com/85486843/210281482-0eb62054-f44e-4c10-959a-65f4147cefca.png)
-
-14. Done:
-
-![image](https://user-images.githubusercontent.com/85486843/210281504-b592db7d-9e6e-47f9-81fc-3619a2f00204.png)
-
-15. Firmware access point should appear now. Connect to it and enter 192.168.4.1 configuration page.
-16. Remember that saved firmware backup is in the "backups" dir
+8. Firmware access point should appear after restarting the module. Based on the chip AP named Open<chip_name>_<partial_mac> , connect to it and enter 192.168.4.1 for configuration page.
+9. Remember that saved firmware backup is in the "backups" dir
 
 # CRC Mismatch?
 CRC/key checks are chip-type dependent. If you get a CRC mismatch, you are most likely selecting a wrong chip type or trying to use firmware intended for another platform.
-![image](https://user-images.githubusercontent.com/85486843/210281290-31d037f5-61c1-403b-a9c5-891fbda75914.png)
 
 # OBK Configuration via UART
 See this tutorial:
@@ -168,11 +143,6 @@ https://www.elektroda.com/rtvforum/viewtopic.php?p=20733610#20733610
 Firmware download will not work on systems without newer TLS version required by GitHub. You can always manually download release from here:
 https://github.com/openshwprojects/OpenBK7231T_App
 and put the matching file into the `firmwares` dir, then restart flasher.
-
-# Automatic reboot on read/write (so you don't have to power cycle manually)
-This tool supports automatic reboot command, just like bkWriter 1.60, but you have to enable UART command line in OBK for it first:
-![image](https://github.com/openshwprojects/BK7231GUIFlashTool/assets/85486843/c63a163f-b1be-4f61-80aa-b161f7c706bd)
-With this option enabled, OBK will receive the "reboot" string sent by flasher on UART before any read/write operation is started and will automatically get bus.
 
 # Other problems?
 You can also try changing the baudrate for flashing. Remember - sometimes higher baud rate might work better than lower one!
