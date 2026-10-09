@@ -128,7 +128,7 @@ namespace BK7231Flasher
                 DropDownStyle = ComboBoxStyle.DropDownList,
             };
             comboBoxTerminalLineEnding.Items.AddRange(new object[] { "CRLF", "LF", "CR", "None" });
-            comboBoxTerminalLineEnding.SelectedIndex = 0;
+            comboBoxTerminalLineEnding.SelectedIndex = 1;
 
             buttonTerminalSend = new Button
             {

@@ -388,6 +388,10 @@ namespace BK7231Flasher
         {
         }
 
+        public virtual void doDetect()
+        {
+        }
+
         public virtual void doReadAndWrite(int startSector, int sectors, string sourceFileName, WriteMode rwMode)
         {
         }

@@ -67,7 +67,7 @@ namespace BK7231Flasher
         {
             Singleton = this;
             InitializeComponent();
-            ConfigureStateLabel(labelState, buttonOpenBackupsDir);
+            ConfigureStateLabel(labelState, textBoxLog);
             ConfigureStateLabel(labelReadRomState, buttonReadRomClearLog);
             ConfigureLogContextMenu(textBoxLog);
             ConfigureLogContextMenu(textBoxReadRomLog);
@@ -516,6 +516,18 @@ namespace BK7231Flasher
                 RichTextUtil.AppendText(logTextBox, s, col);
             });
         }
+
+        void addOperationLogLine(string text, Color color)
+        {
+            RichTextBox logTextBox = getActiveLogTextBox();
+            logTextBox.Invoke((MethodInvoker)delegate {
+                string linePrefix = logTextBox.TextLength > 0
+                    && logTextBox.Text[logTextBox.TextLength - 1] != '\n'
+                    ? Environment.NewLine
+                    : "";
+                RichTextUtil.AppendText(logTextBox, linePrefix + text + Environment.NewLine, color);
+            });
+        }
         //public void setButtonReadLabel(string s)
         //{
         //    Singleton.buttonRead.Invoke((MethodInvoker)delegate {
@@ -721,6 +733,7 @@ namespace BK7231Flasher
                     //setButtonReadLabel(label_startRead);
                     setButtonStates(true);
                     setState("Interrupted by user.", Color.Yellow);
+                    addOperationLogLine("Interrupted by user.", Color.DarkOrange);
                 }
                 return false;
             }
@@ -907,6 +920,15 @@ namespace BK7231Flasher
             flasher.doReadAndWrite(0, 0, "", WriteMode.OnlyOBKConfig);
             worker = null;
             //setButtonReadLabel(label_startRead);
+            clearUp();
+            setButtonStates(true);
+        }
+        void detectChip()
+        {
+            clearUp();
+            createFlasher();
+            flasher.doDetect();
+            worker = null;
             clearUp();
             setButtonStates(true);
         }
@@ -1532,12 +1554,7 @@ namespace BK7231Flasher
         private void buttonDownloadLatest_Click(object sender, EventArgs e)
         {
             refreshType();
-            var res = MessageBox.Show("Do you want to automatically download latest release?", 
-                "Download?", MessageBoxButtons.YesNo);
-            if (res == DialogResult.Yes)
-            {
-                downloadLatestFor(curType);
-            }
+            downloadLatestFor(curType);
         }
         private void comboBoxFirmware_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -2498,11 +2515,11 @@ namespace BK7231Flasher
 
         private void buttonDetect_Click(object sender, EventArgs e)
         {
-            CustomParms cp = new CustomParms();
-            cp.len = 0;
-            cp.ofs = 0;
-            cp.sourceFileName = "";
-            doCustomWrite(cp);
+            if (doGenericOperationPreparations() == false)
+            {
+                return;
+            }
+            startWorkerThread(detectChip);
         }
 
         private void chkUseCompression_CheckedChanged(object sender, EventArgs e)

@@ -1013,8 +1013,7 @@ namespace BK7231Flasher
             }
             observedLinkStage = stage;
             string stageName = stage == BekenLinkStage.BootRom ? "BootROM" : "BL2";
-            addLog("Link-stage probe command 0x" + requestCommand.ToString("X2")
-                + " returned 0x" + response[6].ToString("X2") + "." + Environment.NewLine);
+            addLog(Environment.NewLine);
             addSuccess("Detected link stage: " + stageName + Environment.NewLine);
             if (stage == BekenLinkStage.Bl2)
             {
@@ -1155,6 +1154,35 @@ namespace BK7231Flasher
         public override void doTestReadWrite(int startSector = 0x000, int sectors = 10)
         {
             runModificationOperation(() => doTestReadWriteInternal(startSector, sectors));
+        }
+
+        public override void doDetect()
+        {
+            LastOperationSucceeded = false;
+            try
+            {
+                addLog(Environment.NewLine + "Starting chip detection!" + Environment.NewLine);
+                LastOperationSucceeded = doGenericSetup(false);
+                if (LastOperationSucceeded)
+                {
+                    addSuccess("Chip detection completed." + Environment.NewLine);
+                    logger.setState("Chip detected.", Color.Green);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogOperationException("Chip detection failed: ", ex);
+            }
+            finally
+            {
+                try
+                {
+                    closePort();
+                }
+                catch
+                {
+                }
+            }
         }
         
         public override void doReadAndWrite(int startSector, int sectors, string sourceFileName, WriteMode rwMode)
