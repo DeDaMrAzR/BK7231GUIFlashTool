@@ -1,6 +1,8 @@
-# BK7231 GUI Flash Tool
+# OpenIOT flasher
 
-BK7231 GUI Flash Tool is a simple Windows application that allows you to back up and flash OpenBK/OpenBeken and related Open\* firmware projects to supported IoT chips without extensive programming knowledge. The tool originally focused on Beken BK7231T/BK7231N devices, but the current version supports a wider set of chip and platform modes.
+OpenIOT flasher is a simple Windows application that allows you to back up and flash OpenBK/OpenBeken and related Open\* firmware projects to supported IoT chips without extensive programming knowledge. The tool originally focused on Beken BK7231T/BK7231N devices, but the current version supports a wider set of chip and platform modes.
+
+This project is maintained as the OpenIOT fork of the original [BK7231 GUI Flash Tool](https://github.com/openshwprojects/BK7231GUIFlashTool).
 
 Supported GUI-selectable chip/platform modes:
 - Beken UART:
@@ -80,9 +82,16 @@ It should be possible to compile and run this tool on Linux by using [Mono](http
 
 Once it's installed, you can compile this software by executing `msbuild` on the project directory. To execute the program, you can simply execute the following command:
 
-`mono BK7231Flasher/bin/debug/BK7231Flasher.exe`
+`mono BK7231Flasher/bin/debug/OpenIOT_flasher.exe`
 
-Alternatively, you can use prebuilt release binary.
+Alternatively, you can use a prebuilt OpenIOT flasher release.
+
+## Release versioning
+
+OpenIOT flasher releases use semantic tags. The initial fork release is `v1.0.0`,
+followed by patch releases `v1.0.1`, `v1.0.2`, and so on. Pushing one of these tags
+starts the GitHub release workflow; an ordinary push to `main` only produces a build
+artifact and does not publish a release.
 
 # Brief usage instructions (BK72xx)
 

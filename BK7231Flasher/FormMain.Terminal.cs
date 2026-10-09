@@ -1,0 +1,438 @@
+using System;
+using System.Drawing;
+using System.IO.Ports;
+using System.Text;
+using System.Windows.Forms;
+
+namespace BK7231Flasher
+{
+    public partial class FormMain : Form, ILogListener
+    {
+        private TabPage tabPageTerminal;
+        private ComboBox comboBoxTerminalPort;
+        private ComboBox comboBoxTerminalBaud;
+        private ComboBox comboBoxTerminalLineEnding;
+        private Button buttonTerminalConnect;
+        private Button buttonTerminalClear;
+        private Button buttonTerminalSend;
+        private Label labelTerminalStatus;
+        private RichTextBox textBoxTerminalLog;
+        private TextBox textBoxTerminalCommand;
+        private SerialPort terminalSerialPort;
+
+        private void InitializeTerminalTab()
+        {
+            tabPageTerminal = new TabPage
+            {
+                Text = "Terminal",
+                UseVisualStyleBackColor = true,
+                Padding = new Padding(8),
+            };
+
+            FlowLayoutPanel connectionBar = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Top,
+                Height = 34,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false,
+                Padding = new Padding(0),
+            };
+
+            connectionBar.Controls.Add(new Label
+            {
+                Text = "COM port:",
+                AutoSize = true,
+                Padding = new Padding(0, 6, 0, 0),
+            });
+
+            comboBoxTerminalPort = new ComboBox
+            {
+                Width = 110,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+            };
+            connectionBar.Controls.Add(comboBoxTerminalPort);
+
+            connectionBar.Controls.Add(new Label
+            {
+                Text = "Baud:",
+                AutoSize = true,
+                Padding = new Padding(8, 6, 0, 0),
+            });
+
+            comboBoxTerminalBaud = new ComboBox
+            {
+                Width = 100,
+                DropDownStyle = ComboBoxStyle.DropDown,
+                Text = "115200",
+            };
+            comboBoxTerminalBaud.Items.AddRange(new object[]
+            {
+                9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600,
+                1500000, 2000000, 3000000,
+            });
+            connectionBar.Controls.Add(comboBoxTerminalBaud);
+
+            buttonTerminalConnect = new Button
+            {
+                Text = "Connect",
+                AutoSize = true,
+                Height = 26,
+            };
+            buttonTerminalConnect.Click += ButtonTerminalConnect_Click;
+            connectionBar.Controls.Add(buttonTerminalConnect);
+
+            buttonTerminalClear = new Button
+            {
+                Text = "Clear",
+                AutoSize = true,
+                Height = 26,
+            };
+            buttonTerminalClear.Click += (sender, e) => textBoxTerminalLog.Clear();
+            connectionBar.Controls.Add(buttonTerminalClear);
+
+            labelTerminalStatus = new Label
+            {
+                Text = "Disconnected",
+                AutoSize = true,
+                AutoEllipsis = true,
+                Padding = new Padding(8, 6, 0, 0),
+            };
+            connectionBar.Controls.Add(labelTerminalStatus);
+
+            TableLayoutPanel sendBar = new TableLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 34,
+                ColumnCount = 3,
+                RowCount = 1,
+                Padding = new Padding(0, 4, 0, 0),
+            };
+            sendBar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            sendBar.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+            sendBar.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+
+            textBoxTerminalCommand = new TextBox
+            {
+                Dock = DockStyle.Fill,
+            };
+            textBoxTerminalCommand.KeyDown += TextBoxTerminalCommand_KeyDown;
+
+            comboBoxTerminalLineEnding = new ComboBox
+            {
+                Dock = DockStyle.Fill,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+            };
+            comboBoxTerminalLineEnding.Items.AddRange(new object[] { "CRLF", "LF", "CR", "None" });
+            comboBoxTerminalLineEnding.SelectedIndex = 0;
+
+            buttonTerminalSend = new Button
+            {
+                Text = "Send",
+                Dock = DockStyle.Fill,
+                Enabled = false,
+            };
+            buttonTerminalSend.Click += ButtonTerminalSend_Click;
+
+            sendBar.Controls.Add(textBoxTerminalCommand, 0, 0);
+            sendBar.Controls.Add(comboBoxTerminalLineEnding, 1, 0);
+            sendBar.Controls.Add(buttonTerminalSend, 2, 0);
+
+            textBoxTerminalLog = new RichTextBox
+            {
+                Dock = DockStyle.Fill,
+                ReadOnly = true,
+                WordWrap = false,
+                DetectUrls = false,
+                BackColor = SystemColors.Window,
+                Font = new Font(FontFamily.GenericMonospace, 9.0f),
+            };
+            ConfigureLogContextMenu(textBoxTerminalLog);
+
+            tabPageTerminal.Controls.Add(textBoxTerminalLog);
+            tabPageTerminal.Controls.Add(sendBar);
+            tabPageTerminal.Controls.Add(connectionBar);
+            EnsureTerminalTabPresent();
+        }
+
+        private void EnsureTerminalTabPresent()
+        {
+            if (tabPageTerminal == null || tabControl1.TabPages.Contains(tabPageTerminal))
+                return;
+
+            tabControl1.TabPages.Insert(Math.Min(2, tabControl1.TabPages.Count), tabPageTerminal);
+        }
+
+        private bool IsTerminalConnected
+        {
+            get
+            {
+                try
+                {
+                    return terminalSerialPort != null && terminalSerialPort.IsOpen;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        private void RefreshTerminalPorts(string[] ports)
+        {
+            if (comboBoxTerminalPort == null)
+                return;
+
+            string previousPort = getSelectedSerialName(comboBoxTerminalPort);
+            SerialPort activePort = terminalSerialPort;
+            if (activePort != null)
+            {
+                previousPort = activePort.PortName;
+                bool connectedPortStillPresent = Array.IndexOf(ports, previousPort) >= 0;
+                bool connectionStillOpen;
+                try
+                {
+                    connectionStillOpen = activePort.IsOpen;
+                }
+                catch
+                {
+                    connectionStillOpen = false;
+                }
+
+                if (!connectedPortStillPresent || !connectionStillOpen)
+                {
+                    AppendTerminalLine("COM port disconnected", Color.Red);
+                    DisconnectTerminal(false);
+                }
+            }
+
+            if (TerminalPortListMatches(ports))
+                return;
+
+            setPortComboBoxItems(comboBoxTerminalPort, ports, previousPort);
+        }
+
+        private bool TerminalPortListMatches(string[] ports)
+        {
+            if (comboBoxTerminalPort.Items.Count != ports.Length)
+                return false;
+
+            for (int index = 0; index < ports.Length; index++)
+            {
+                if (!string.Equals(comboBoxTerminalPort.Items[index].ToString(), ports[index], StringComparison.Ordinal))
+                    return false;
+            }
+            return true;
+        }
+
+        private void ButtonTerminalConnect_Click(object sender, EventArgs e)
+        {
+            if (terminalSerialPort != null)
+            {
+                DisconnectTerminal(true);
+                return;
+            }
+
+            string portName = getSelectedSerialName(comboBoxTerminalPort);
+            if (string.IsNullOrWhiteSpace(portName))
+            {
+                AppendTerminalLine("Select a COM port first.", Color.Red);
+                return;
+            }
+
+            int baudRate;
+            if (!int.TryParse(comboBoxTerminalBaud.Text, out baudRate) || baudRate <= 0)
+            {
+                AppendTerminalLine("Enter a valid baud rate.", Color.Red);
+                return;
+            }
+
+            SerialPort port = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One)
+            {
+                Handshake = Handshake.None,
+                Encoding = Encoding.ASCII,
+                ReadTimeout = 500,
+                WriteTimeout = 500,
+            };
+            port.DataReceived += TerminalSerialPort_DataReceived;
+            terminalSerialPort = port;
+
+            try
+            {
+                port.Open();
+                SetTerminalConnectedState(true);
+                AppendTerminalLine("Connected to " + portName + " at " + baudRate + " baud.", Color.Green);
+                textBoxTerminalCommand.Focus();
+            }
+            catch (Exception ex)
+            {
+                terminalSerialPort = null;
+                port.DataReceived -= TerminalSerialPort_DataReceived;
+                port.Dispose();
+                AppendTerminalLine("Unable to open " + portName + ": " + ex.Message, Color.Red);
+            }
+        }
+
+        private void TerminalSerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort port = sender as SerialPort;
+            if (port == null || port != terminalSerialPort)
+                return;
+
+            try
+            {
+                string received = port.ReadExisting();
+                if (!string.IsNullOrEmpty(received))
+                    AppendTerminalText(received, Color.Black);
+            }
+            catch (Exception ex)
+            {
+                if (port != terminalSerialPort || IsDisposed || Disposing)
+                    return;
+
+                try
+                {
+                    BeginInvoke((MethodInvoker)delegate
+                    {
+                        if (port != terminalSerialPort)
+                            return;
+                        AppendTerminalLine("Receive failed: " + ex.Message, Color.Red);
+                        DisconnectTerminal(false);
+                    });
+                }
+                catch (InvalidOperationException)
+                {
+                }
+            }
+        }
+
+        private void ButtonTerminalSend_Click(object sender, EventArgs e)
+        {
+            SendTerminalCommand();
+        }
+
+        private void TextBoxTerminalCommand_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter)
+                return;
+
+            e.SuppressKeyPress = true;
+            SendTerminalCommand();
+        }
+
+        private void SendTerminalCommand()
+        {
+            if (!IsTerminalConnected)
+            {
+                AppendTerminalLine("Connect to a COM port before sending.", Color.Red);
+                return;
+            }
+
+            string command = textBoxTerminalCommand.Text;
+            if (command.Length == 0)
+                return;
+
+            string lineEnding;
+            switch (comboBoxTerminalLineEnding.SelectedItem as string)
+            {
+                case "LF":
+                    lineEnding = "\n";
+                    break;
+                case "CR":
+                    lineEnding = "\r";
+                    break;
+                case "None":
+                    lineEnding = "";
+                    break;
+                default:
+                    lineEnding = "\r\n";
+                    break;
+            }
+
+            try
+            {
+                terminalSerialPort.Write(command + lineEnding);
+                AppendTerminalLine("> " + command, Color.Blue);
+                textBoxTerminalCommand.Clear();
+            }
+            catch (Exception ex)
+            {
+                AppendTerminalLine("Send failed: " + ex.Message, Color.Red);
+                DisconnectTerminal(false);
+            }
+        }
+
+        private void DisconnectTerminal(bool reportDisconnect)
+        {
+            SerialPort port = terminalSerialPort;
+            terminalSerialPort = null;
+
+            if (port != null)
+            {
+                port.DataReceived -= TerminalSerialPort_DataReceived;
+                try
+                {
+                    if (port.IsOpen)
+                        port.Close();
+                }
+                catch
+                {
+                }
+                try
+                {
+                    port.Dispose();
+                }
+                catch
+                {
+                }
+            }
+
+            SetTerminalConnectedState(false);
+            if (reportDisconnect)
+                AppendTerminalLine("Disconnected.", Color.DarkOrange);
+        }
+
+        private void CloseTerminalPort()
+        {
+            DisconnectTerminal(false);
+        }
+
+        private void SetTerminalConnectedState(bool connected)
+        {
+            comboBoxTerminalPort.Enabled = !connected;
+            comboBoxTerminalBaud.Enabled = !connected;
+            buttonTerminalConnect.Text = connected ? "Disconnect" : "Connect";
+            buttonTerminalSend.Enabled = connected;
+            labelTerminalStatus.Text = connected ? "Connected" : "Disconnected";
+            labelTerminalStatus.ForeColor = connected ? Color.DarkGreen : SystemColors.ControlText;
+        }
+
+        private void AppendTerminalLine(string text, Color color)
+        {
+            AppendTerminalText(text + Environment.NewLine, color);
+        }
+
+        private void AppendTerminalText(string text, Color color)
+        {
+            if (textBoxTerminalLog == null || textBoxTerminalLog.IsDisposed)
+                return;
+
+            if (textBoxTerminalLog.InvokeRequired)
+            {
+                try
+                {
+                    textBoxTerminalLog.BeginInvoke((MethodInvoker)delegate
+                    {
+                        if (!textBoxTerminalLog.IsDisposed)
+                            RichTextUtil.AppendText(textBoxTerminalLog, text, color);
+                    });
+                }
+                catch (InvalidOperationException)
+                {
+                }
+                return;
+            }
+
+            RichTextUtil.AppendText(textBoxTerminalLog, text, color);
+        }
+    }
+}

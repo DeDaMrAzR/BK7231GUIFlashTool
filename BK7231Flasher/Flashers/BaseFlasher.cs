@@ -100,6 +100,9 @@ namespace BK7231Flasher
         protected CancellationToken cancellationToken;
         protected XMODEM xm;
         protected bool isCancelled = false;
+        private bool serialConnectionLost;
+        private bool serialConnectionLostLogged;
+        private bool serialPortWasOpen;
 
         public BaseFlasher(CancellationToken ct)
         {
@@ -122,44 +125,146 @@ namespace BK7231Flasher
             this.serialName = serialName;
             this.chipType = bkType;
             this.baudrate = baudrate;
+            serialConnectionLost = false;
+            serialConnectionLostLogged = false;
+            serialPortWasOpen = false;
+        }
+
+        protected bool HasSerialConnectionBeenLost => serialConnectionLost;
+
+        protected bool IsSerialConnectionLostException(Exception ex)
+        {
+            for (Exception current = ex; current != null; current = current.InnerException)
+            {
+                string message = current.Message ?? string.Empty;
+                string stackTrace = current.StackTrace ?? string.Empty;
+                bool serialStack = stackTrace.IndexOf("System.IO.Ports", StringComparison.OrdinalIgnoreCase) >= 0
+                    || stackTrace.IndexOf("SerialStream", StringComparison.OrdinalIgnoreCase) >= 0
+                    || stackTrace.IndexOf("SerialPort", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (current is InvalidOperationException
+                    && (message.IndexOf("port is closed", StringComparison.OrdinalIgnoreCase) >= 0
+                        || message.IndexOf("port is not open", StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    return true;
+                }
+                if (current is ObjectDisposedException && serialStack)
+                {
+                    return true;
+                }
+                if ((current is UnauthorizedAccessException || current is IOException) && serialStack)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected bool HandleSerialConnectionLost(Exception ex)
+        {
+            if (IsSerialConnectionLostException(ex) == false)
+            {
+                return false;
+            }
+
+            serialConnectionLost = true;
+            if (cancellationToken.IsCancellationRequested || serialConnectionLostLogged)
+            {
+                return true;
+            }
+
+            serialConnectionLostLogged = true;
+            logger?.setLogProgress("COM port disconnected" + Environment.NewLine, Color.Red);
+            logger?.setState("COM port disconnected", Color.Red);
+            return true;
+        }
+
+        protected void LogOperationException(string context, Exception ex)
+        {
+            if (HandleSerialConnectionLost(ex))
+            {
+                return;
+            }
+            addErrorLine(context + ex.Message);
+        }
+
+        private bool LooksLikeSerialConnectionLostText(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            return text.IndexOf("access to the port is denied", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("port is closed", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("port is not open", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("device attached to the system is not functioning", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("semaphore timeout period has expired", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private void WriteLog(string text, Color color)
+        {
+            try
+            {
+                if (serial != null && serial.IsOpen)
+                {
+                    serialPortWasOpen = true;
+                }
+            }
+            catch
+            {
+            }
+
+            if (serialPortWasOpen && LooksLikeSerialConnectionLostText(text))
+            {
+                serialConnectionLost = true;
+                if (cancellationToken.IsCancellationRequested || serialConnectionLostLogged)
+                {
+                    return;
+                }
+                serialConnectionLostLogged = true;
+                logger?.setLogProgress("COM port disconnected" + Environment.NewLine, Color.Red);
+                logger?.setState("COM port disconnected", Color.Red);
+                return;
+            }
+            logger.addLog(text, color);
         }
         public void addLog(string format, params object[] args)
         {
             string s = string.Format(format, args);
-            logger.addLog(s, Color.Black);
+            WriteLog(s, Color.Black);
         }
         public void addLog(string s)
         {
-            logger.addLog(s, Color.Black);
+            WriteLog(s, Color.Black);
         }
         public void addLogLine(string format = "", params object[] args)
         {
             string s = string.Format(format, args);
-            logger.addLog(s + Environment.NewLine, Color.Black);
+            WriteLog(s + Environment.NewLine, Color.Black);
         }
         public void addLogLine(string s)
         {
-            logger.addLog(s+Environment.NewLine, Color.Black);
+            WriteLog(s+Environment.NewLine, Color.Black);
         }
         public void addErrorLine(string s)
         {
-            logger.addLog(s + Environment.NewLine, Color.Red);
+            WriteLog(s + Environment.NewLine, Color.Red);
         }
         public void addError(string s)
         {
-            logger.addLog(s, Color.Red);
+            WriteLog(s, Color.Red);
         }
         public void addSuccess(string s)
         {
-            logger.addLog(s, Color.Green);
+            WriteLog(s, Color.Green);
         }
         public void addWarning(string s)
         {
-            logger.addLog(s, Color.Orange);
+            WriteLog(s, Color.Orange);
         }
         public void addWarningLine(string s)
         {
-            logger.addLog(s + Environment.NewLine, Color.Orange);
+            WriteLog(s + Environment.NewLine, Color.Orange);
         }
         public void setBackupName(string newName)
         {
@@ -184,6 +289,27 @@ namespace BK7231Flasher
         public static string formatHex(long i)
         {
             return "0x" + i.ToString("X2");
+        }
+        protected static string FormatFlashInfo(int jedecId, string manufacturer, int sizeBytes)
+        {
+            string jedecBytes = string.Format("{0:X2}-{1:X2}-{2:X2}",
+                jedecId & 0xff, (jedecId >> 8) & 0xff, (jedecId >> 16) & 0xff);
+            string size;
+            if (sizeBytes > 0 && sizeBytes % (1024 * 1024) == 0)
+            {
+                size = (sizeBytes / (1024 * 1024)) + " MB";
+            }
+            else if (sizeBytes > 0 && sizeBytes % 1024 == 0)
+            {
+                size = (sizeBytes / 1024) + " KB";
+            }
+            else
+            {
+                size = sizeBytes + " bytes";
+            }
+            return "Flash info: JEDEC ID " + jedecBytes
+                + ", Manufacturer " + manufacturer
+                + ", size " + size + " (0x" + sizeBytes.ToString("X") + " bytes).";
         }
         public void setSkipKeyCheck(bool b)
         {

@@ -423,7 +423,7 @@ namespace BK7231Flasher
             SPIFlashInfo flashInfo = SPIFlashInfoList.Singleton.findFlashForMID(deviceMID);
             if(flashInfo != null)
             {
-                addLogLine("Flash information: " + flashInfo.ToString());
+                addLogLine(FormatFlashInfo(deviceMID, flashInfo.manufacturer, flashSize));
                 if(flashInfo.szMem != flashSize)
                 {
                     addWarningLine("JEDEC flash size differs from flash list size: JEDEC="

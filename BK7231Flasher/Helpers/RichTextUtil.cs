@@ -24,5 +24,19 @@ namespace BK7231Flasher
 
             SendMessage(box.Handle, WM_VSCROLL, SB_BOTTOM, 0);
         }
+
+        public static void ReplaceCurrentLine(RichTextBox box, string text, Color color)
+        {
+            int lineStart = box.Text.LastIndexOf('\n');
+            lineStart = lineStart < 0 ? 0 : lineStart + 1;
+
+            box.SelectionStart = lineStart;
+            box.SelectionLength = box.TextLength - lineStart;
+            box.SelectionColor = color;
+            box.SelectedText = text;
+            box.SelectionColor = box.ForeColor;
+
+            SendMessage(box.Handle, WM_VSCROLL, SB_BOTTOM, 0);
+        }
     }
 }

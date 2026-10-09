@@ -7,7 +7,7 @@
     <ProjectGuid>{39F45A2F-E298-4073-8E84-A95924A43363}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>BK7231Flasher</RootNamespace>
-    <AssemblyName>BK7231Flasher</AssemblyName>
+    <AssemblyName>OpenIOT_flasher</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -112,6 +112,10 @@
       <DependentUpon>FormExtractedConfig.cs</DependentUpon>
     </Compile>
     <Compile Include="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.Terminal.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormMain.Designer.cs">

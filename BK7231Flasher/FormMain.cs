@@ -67,10 +67,48 @@ namespace BK7231Flasher
         {
             Singleton = this;
             InitializeComponent();
+            ConfigureStateLabel(labelState, buttonOpenBackupsDir);
+            ConfigureStateLabel(labelReadRomState, buttonReadRomClearLog);
+            ConfigureLogContextMenu(textBoxLog);
+            ConfigureLogContextMenu(textBoxReadRomLog);
             InitializeBl602IoExtractorTab();
+            InitializeTerminalTab();
             var version = Assembly.GetExecutingAssembly().GetCustomAttribute<BuildVersion>().Value;
-            Text += $" (build {(string.IsNullOrWhiteSpace(version) ? "local" : version)})";
+            Text = $"OpenIOT flasher {(string.IsNullOrWhiteSpace(version) ? "local" : version)}";
         }
+
+        void ConfigureStateLabel(Label stateLabel, Control rightBoundary)
+        {
+            int labelHeight = stateLabel.Height;
+            stateLabel.AutoSize = false;
+            stateLabel.AutoEllipsis = true;
+            stateLabel.Size = new Size(
+                Math.Max(1, rightBoundary.Left - stateLabel.Left - 8),
+                labelHeight);
+            stateLabel.TextAlign = ContentAlignment.MiddleLeft;
+        }
+
+        void ConfigureLogContextMenu(RichTextBox logTextBox)
+        {
+            ContextMenuStrip contextMenu = new ContextMenuStrip(components);
+            ToolStripMenuItem copyItem = new ToolStripMenuItem("Copy");
+            ToolStripMenuItem selectAllItem = new ToolStripMenuItem("Select all");
+
+            copyItem.ShortcutKeys = Keys.Control | Keys.C;
+            copyItem.Click += (sender, e) => logTextBox.Copy();
+            selectAllItem.ShortcutKeys = Keys.Control | Keys.A;
+            selectAllItem.Click += (sender, e) => logTextBox.SelectAll();
+            contextMenu.Opening += (sender, e) =>
+            {
+                copyItem.Enabled = logTextBox.SelectionLength > 0;
+                selectAllItem.Enabled = logTextBox.TextLength > 0;
+            };
+
+            contextMenu.Items.Add(copyItem);
+            contextMenu.Items.Add(selectAllItem);
+            logTextBox.ContextMenuStrip = contextMenu;
+        }
+
         public string getFirmwareDir()
         {
             return firmwaresPath;
@@ -94,6 +132,7 @@ namespace BK7231Flasher
                     }
                     if(bChange == false)
                     {
+                        RefreshTerminalPorts(newPorts);
                         return;
                     }
                 }
@@ -104,6 +143,7 @@ namespace BK7231Flasher
             allPorts = newPorts;
             setPortComboBoxItems(comboBoxUART, allPorts, prevPort);
             setPortComboBoxItems(comboBoxReadRomUART, allPorts, prevReadRomPort);
+            RefreshTerminalPorts(allPorts);
         }
 
         string getComboBoxSelectedText(ComboBox comboBox)
@@ -182,6 +222,7 @@ namespace BK7231Flasher
             //// t.extractKeys();
 
             tabControl1.TabPages.Remove(tabPagePageTool);
+            EnsureTerminalTabPresent();
             if (Directory.Exists(backupsPath) == false)
             {
                 Directory.CreateDirectory(backupsPath);
@@ -452,6 +493,15 @@ namespace BK7231Flasher
         public void addLog(string s, Color col)
         {
             addLogToTextBox(getActiveLogTextBox(), s, col);
+        }
+
+        public void setLogProgress(string s, Color col)
+        {
+            RichTextBox logTextBox = getActiveLogTextBox();
+            logTextBox.Invoke((MethodInvoker)delegate {
+                // Running on the UI thread
+                RichTextUtil.ReplaceCurrentLine(logTextBox, s, col);
+            });
         }
 
         void addReadRomLog(string s, Color col)
@@ -897,6 +947,11 @@ namespace BK7231Flasher
                 return;
             }
             flasher.doWrite(startOfs, data);
+            if (flasher is BK7231Flasher bkFlasher && bkFlasher.LastOperationSucceeded)
+            {
+                addLog("RF partition restore completed." + Environment.NewLine, Color.Green);
+                setState("RF restore complete.", Color.Green);
+            }
             worker = null;
             //setButtonReadLabel(label_startRead);
             clearUp();
@@ -2296,6 +2351,7 @@ namespace BK7231Flasher
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            CloseTerminalPort();
             killScanner();
         }
 

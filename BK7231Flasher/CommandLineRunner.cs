@@ -195,7 +195,7 @@ namespace BK7231Flasher
                 if (string.IsNullOrEmpty(tuyaInputFile) || string.IsNullOrEmpty(tuyaOutputFile))
                 {
                     Console.Error.WriteLine("Error: tuyaconfig requires two arguments: <input.bin> <output.json>");
-                    Console.Error.WriteLine("Usage: BK7231Flasher.exe tuyaconfig <input.bin> <output.json>");
+                    Console.Error.WriteLine("Usage: OpenIOT_flasher.exe tuyaconfig <input.bin> <output.json>");
                     Environment.Exit(1);
                     return;
                 }
@@ -734,9 +734,9 @@ namespace BK7231Flasher
 
         static void PrintHelp()
         {
-            Console.WriteLine("BK7231 GUI Flash Tool - Command Line Mode");
+            Console.WriteLine("OpenIOT flasher - Command Line Mode");
             Console.WriteLine();
-            Console.WriteLine("Usage: BK7231Flasher.exe [options] <command> [command options]");
+            Console.WriteLine("Usage: OpenIOT_flasher.exe [options] <command> [command options]");
             Console.WriteLine();
             Console.WriteLine("Commands:");
             Console.WriteLine("  read_flash             Read flash region (requires --addr and --size)");
@@ -758,12 +758,12 @@ namespace BK7231Flasher
             Console.WriteLine("  --no-stub              Use legacy (ROM-only) mode for ESP8266/ESP32 family chips (disable stub flasher)");
             Console.WriteLine();
             Console.WriteLine("Examples:");
-            Console.WriteLine("  BK7231Flasher.exe --port COM3 --chip BK7231N fread --out mybackup");
-            Console.WriteLine("  BK7231Flasher.exe --port COM3 --chip BK7231N fwrite firmware.bin");
-            Console.WriteLine("  BK7231Flasher.exe --port COM3 --chip BK7231N read_flash --addr 0x11000 --size 0x1000");
-            Console.WriteLine("  BK7231Flasher.exe --port COM3 --chip BK7231N write_flash data.bin --addr 0x0 --size 0x1000");
-            Console.WriteLine("  BK7231Flasher.exe --port COM3 --chip BK7231N test --addr 0x11000 --size 0x1000");
-            Console.WriteLine("  BK7231Flasher.exe tuyaconfig firmware_dump.bin tuya_config.json");
+            Console.WriteLine("  OpenIOT_flasher.exe --port COM3 --chip BK7231N fread --out mybackup");
+            Console.WriteLine("  OpenIOT_flasher.exe --port COM3 --chip BK7231N fwrite firmware.bin");
+            Console.WriteLine("  OpenIOT_flasher.exe --port COM3 --chip BK7231N read_flash --addr 0x11000 --size 0x1000");
+            Console.WriteLine("  OpenIOT_flasher.exe --port COM3 --chip BK7231N write_flash data.bin --addr 0x0 --size 0x1000");
+            Console.WriteLine("  OpenIOT_flasher.exe --port COM3 --chip BK7231N test --addr 0x11000 --size 0x1000");
+            Console.WriteLine("  OpenIOT_flasher.exe tuyaconfig firmware_dump.bin tuya_config.json");
             Console.WriteLine();
             Console.WriteLine("Legacy aliases (backward compatible):");
             Console.WriteLine("  -read, -write, -cread, -cwrite, -test, -port, -baud, -chip, -ofs, -len, -out, -legacy");
