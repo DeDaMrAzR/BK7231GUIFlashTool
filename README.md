@@ -98,8 +98,8 @@ artifact and does not publish a release.
 1. Connect a 3.3 V USB-to-UART converter to the selected Beken chip's flash-download UART; use the in-app guide for the exact TX/RX pins
 2. Start flasher tool
 3. Select the correct platform for your chip
-4. Click "Download latest from web" to get firmware binary
-5. Click "Do backup and flash new"
+4. Click "Download latest release" to get firmware binary
+5. Click "Backup then Write FW"
 6. Reset/repower Beken
 7. Tool will do both read and flash in one go.
 8. Done!
@@ -124,13 +124,16 @@ No command line and no strange arguments required.
 
 4. Select your COM port of USB to UART converter
 5. Select proper platform
-6. Click "Download latest from Web" to get proper binary file, or place a matching firmware file manually in the `firmwares` directory
+6. Click "Download latest release" to get the proper binary file, or place a matching firmware file manually in the `firmwares` directory
 7. Wait for download to finish
 
 ![image](https://user-images.githubusercontent.com/85486843/210281125-a3e25ab2-3144-4e02-a30c-6e135ecefd24.png)
 
-8. Firmware access point should appear after restarting the module. Based on the chip AP named Open<chip_name>_<partial_mac> , connect to it and enter 192.168.4.1 for configuration page.
-9. Remember that saved firmware backup is in the "backups" dir
+8. Click "Backup then Write FW".
+9. When the log displays `Getting bus...`, reset or power-cycle the module, or briefly short CEN to ground.
+10. Wait while the tool backs up the existing firmware and writes the selected firmware.
+11. Restart the module and connect to its access point, named `Open<chip_name>_<partial_mac>`. Open `192.168.4.1` to access the configuration page.
+12. The original firmware backup is saved in the `backups` directory.
 
 # CRC Mismatch?
 CRC/key checks are chip-type dependent. If you get a CRC mismatch, you are most likely selecting a wrong chip type or trying to use firmware intended for another platform.
