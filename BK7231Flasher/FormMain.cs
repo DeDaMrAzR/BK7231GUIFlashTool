@@ -706,11 +706,12 @@ namespace BK7231Flasher
             applySerialControlState(chipTypeComboBox, uartComboBox, baudRateComboBox, true);
         }
 
-        void applySerialControlState(ComboBox chipTypeComboBox, ComboBox uartComboBox, ComboBox baudRateComboBox, bool operationControlsEnabled)
+        void applySerialControlState(ComboBox chipTypeComboBox, ComboBox uartComboBox, ComboBox baudRateComboBox,
+            bool operationControlsEnabled, bool allowPortSelectionWithoutPlatform = false)
         {
             BKType selectedType = getSelectedChipType(chipTypeComboBox);
             bool usesSerialPort = selectedType != BKType.Invalid && FlashPlatformCatalog.UsesSerialPort(selectedType);
-            uartComboBox.Enabled = operationControlsEnabled && usesSerialPort;
+            uartComboBox.Enabled = operationControlsEnabled && (usesSerialPort || allowPortSelectionWithoutPlatform);
             baudRateComboBox.Enabled = operationControlsEnabled && usesSerialPort;
         }
         bool interruptIfRequired()
@@ -1717,7 +1718,7 @@ namespace BK7231Flasher
                 buttonReadRomStop.Enabled = !b;
                 comboBoxReadRomChipType.Enabled = b;
                 groupBoxReadRomTargets.Enabled = b;
-                applySerialControlState(comboBoxReadRomChipType, comboBoxReadRomUART, comboBoxReadRomBaudRate, b);
+                applySerialControlState(comboBoxReadRomChipType, comboBoxReadRomUART, comboBoxReadRomBaudRate, b, true);
                 updateReadRomReadButtonState();
             });
         }
@@ -1756,7 +1757,7 @@ namespace BK7231Flasher
             {
                 return;
             }
-            applySerialControlState(comboBoxReadRomChipType, comboBoxReadRomUART, comboBoxReadRomBaudRate, worker == null);
+            applySerialControlState(comboBoxReadRomChipType, comboBoxReadRomUART, comboBoxReadRomBaudRate, worker == null, true);
             updateReadRomControlsForSelectedPlatform(tabControl1.SelectedTab == tabPageReadRom);
         }
 
