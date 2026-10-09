@@ -177,6 +177,31 @@ namespace BK7231Flasher
             }
         }
 
+        private bool EnsureTerminalPortAvailableForOperation(string requestedPort)
+        {
+            if (!IsTerminalConnected
+                || !string.Equals(terminalSerialPort.PortName, requestedPort, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            DialogResult result = MessageBox.Show(
+                this,
+                requestedPort + " is currently connected in Terminal. Disconnect it and continue?",
+                "COM port in use",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2);
+            if (result != DialogResult.Yes)
+            {
+                return false;
+            }
+
+            AppendTerminalLine("Disconnected from " + requestedPort + " for flasher operation.", Color.DarkOrange);
+            DisconnectTerminal(false);
+            return true;
+        }
+
         private void RefreshTerminalPorts(string[] ports)
         {
             if (comboBoxTerminalPort == null)

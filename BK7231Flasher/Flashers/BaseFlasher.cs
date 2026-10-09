@@ -103,6 +103,7 @@ namespace BK7231Flasher
         private bool serialConnectionLost;
         private bool serialConnectionLostLogged;
         private bool serialPortWasOpen;
+        private bool serialPortOpenFailed;
 
         public BaseFlasher(CancellationToken ct)
         {
@@ -128,9 +129,22 @@ namespace BK7231Flasher
             serialConnectionLost = false;
             serialConnectionLostLogged = false;
             serialPortWasOpen = false;
+            serialPortOpenFailed = false;
         }
 
         protected bool HasSerialConnectionBeenLost => serialConnectionLost;
+        protected bool HasSerialPortOpenFailed => serialPortOpenFailed;
+
+        protected void ReportSerialPortOpenFailure(Exception ex)
+        {
+            serialPortOpenFailed = true;
+            string portName = string.IsNullOrWhiteSpace(serialName) ? "COM port" : serialName;
+            string message = ex is UnauthorizedAccessException
+                ? portName + " is busy or access is denied."
+                : "Unable to open " + portName + ": " + ex.Message;
+            addErrorLine(message);
+            logger?.setState("COM port unavailable", Color.Red);
+        }
 
         protected bool IsSerialConnectionLostException(Exception ex)
         {

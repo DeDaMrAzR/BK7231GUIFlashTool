@@ -757,6 +757,10 @@ namespace BK7231Flasher
                     MessageBox.Show("Please choose a correct serial port or connect one if not present.");
                     return false;
                 }
+                if (EnsureTerminalPortAvailableForOperation(serialName) == false)
+                {
+                    return false;
+                }
             }
             else
             {

@@ -95,7 +95,7 @@ namespace BK7231Flasher
             }
             catch (Exception ex)
             {
-                addError("Serial port create exception: " + ex.ToString() + Environment.NewLine);
+                ReportSerialPortOpenFailure(ex);
                 return true;
             }
             try
@@ -113,7 +113,7 @@ namespace BK7231Flasher
             }
             catch(Exception ex)
             {
-                addError("Serial port open exception: " + ex.ToString() + Environment.NewLine);
+                ReportSerialPortOpenFailure(ex);
                 return true;
             }
             return false;
@@ -1215,7 +1215,7 @@ namespace BK7231Flasher
         {
             if(ms == null)
             {
-                if (HasSerialConnectionBeenLost || cancellationToken.IsCancellationRequested)
+                if (HasSerialConnectionBeenLost || HasSerialPortOpenFailed || cancellationToken.IsCancellationRequested)
                 {
                     return false;
                 }
@@ -1311,8 +1311,6 @@ namespace BK7231Flasher
             addLog("Going to open port: " + serialName + "." + Environment.NewLine);
             if (openPort())
             {
-                logger.setState("Open serial failed!", Color.Red);
-                addError("Failed to open serial port!" + Environment.NewLine);
                 return false;
             }
             addSuccess("Serial port open!" + Environment.NewLine);
