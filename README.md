@@ -86,13 +86,6 @@ Once it's installed, you can compile this software by executing `msbuild` on the
 
 Alternatively, you can use a prebuilt OpenIOT flasher release.
 
-## Release versioning
-
-OpenIOT flasher releases use semantic tags. The initial fork release is `v1.0.0`,
-followed by patch releases `v1.0.1`, `v1.0.2`, and so on. Pushing one of these tags
-starts the GitHub release workflow; an ordinary push to `main` only produces a build
-artifact and does not publish a release.
-
 # Brief usage instructions (BK72xx)
 
 1. Connect a 3.3 V USB-to-UART converter to the selected Beken chip's flash-download UART; use the in-app guide for the exact TX/RX pins
