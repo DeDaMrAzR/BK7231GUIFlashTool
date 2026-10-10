@@ -44,7 +44,7 @@ namespace BK7231Flasher
             { BKType.RTL8720E,   "RTL8720E (AmebaLite)" },
             { BKType.RTL87X0C,   "RTL87X0C (AmebaZ2)" },
             { BKType.TR6260,     "TR6260" },
-            { BKType.W600,       "W600 (write)" },
+            { BKType.W600,       "W600" },
             { BKType.W800,       "W800" },
             { BKType.XR806,      "XR806" },
             { BKType.XR809,      "XR809" },

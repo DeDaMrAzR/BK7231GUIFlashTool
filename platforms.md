@@ -29,7 +29,7 @@
 | RTL87X0C (AmebaZ2) | Realtek | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ✅ |
 | RTL8721DA (AmebaDp) | Realtek | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ✅ |
 | RTL8720E (AmebaLite) | Realtek | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ✅ |
-| W600 (write only) | WinnerMicro | ❌⁵ | ✅⁵ | ➖ | ➖ | ✅ | ⚠️⁵ | ➖ | ➖ | ❌ |
+| W600 | WinnerMicro | ⚠️⁵ | ✅⁵ | ➖ | ➖ | ✅ | ⚠️⁵ | ➖ | ➖ | ⚠️⁵ |
 | W80x | WinnerMicro | ✅ | ✅ | ➖ | ➖ | ✅ | ✅ | ➖ | ➖ | ℹ️ |
 | XR806 | XRadio | ✅ | ✅ | ➖ | ➖ | ✅ | ✅ | ➖ | ➖ | ✅ |
 | XR809 | XRadio | ✅ | ✅ | ➖ | ➖ | ✅ | ✅ | ➖ | ➖ | ✅ |
@@ -49,6 +49,6 @@ R cmp / W cmp - Read/write compression via custom flasher stub; ➖ means not ap
 ² OBK config location is not defined for this platform<br>
 ³ Always writes from `0x0`<br>
 ⁴ Custom reads work, but custom writes still follow the image/partition flow instead of arbitrary raw offsets.<br>
-⁵ Write-only; standalone OBK config writes are disabled and config injection only happens during a full firmware write.<br>
+⁵ W600 backup installs a read-only UART helper by replacing flash sector `0x10000-0x10FFF`; hold PA0 low for installation, then release PA0 and reset when prompted. The saved image therefore contains the helper in that sector. Standalone OBK config writes remain disabled.<br>
 ⁶ OBK config reads work, but standalone OBK config writes are not implemented.<br>
 ⁷ RF partition restore and relocation are not defined for this platform.<br>
