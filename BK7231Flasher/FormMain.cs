@@ -1349,6 +1349,7 @@ namespace BK7231Flasher
         }
         public void onReadResultQIOSaved(byte[] dat, string lastEncryptionKey, string fullPath)
         {
+            bool obkConfigExtracted = false;
             if (checkBoxReadOBKConfig.Checked)
             {
                 addLog("Backup created, now will attempt to extract OBK config." + Environment.NewLine, Color.Gray);
@@ -1364,6 +1365,7 @@ namespace BK7231Flasher
                 else
                 {
                     addLog("OBK config extracted." + Environment.NewLine, Color.Green);
+                    obkConfigExtracted = true;
                 }
             }
             else
@@ -1371,7 +1373,11 @@ namespace BK7231Flasher
                 addLog("Backup created, but OBK config reading is disabled on GUI, skipping extraction." + Environment.NewLine, Color.Gray);
             }
 
-            if (checkBoxAutoReadTuya.Checked == false)
+            if (obkConfigExtracted && curType == BKType.W600)
+            {
+                addLog("Valid OBK config found; automatic Tuya config scan skipped." + Environment.NewLine, Color.Gray);
+            }
+            else if (checkBoxAutoReadTuya.Checked == false)
             {
                 addLog("Backup created, but Tuya config reading is disabled on GUI, skipping extraction."+Environment.NewLine, Color.Gray);
             }

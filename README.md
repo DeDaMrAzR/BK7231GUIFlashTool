@@ -43,7 +43,7 @@ Supported GUI-selectable chip/platform modes:
   - RTL8721DA (AmebaDp)
   - RTL8720E (AmebaLite)
 - WinnerMicro:
-  - W600 (write only atm)
+  - W600
   - W800/W803
 - XRadio:
   - XR806

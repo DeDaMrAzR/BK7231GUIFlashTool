@@ -113,8 +113,14 @@ namespace BK7231Flasher
                     xm?.CancelFileTransfer();
                     xm.InProgress.Wait(500);
                 }
-                closePort();
+                if(!KeepSerialPortOpenForCancellationRecovery())
+                    closePort();
             });
+        }
+
+        protected virtual bool KeepSerialPortOpenForCancellationRecovery()
+        {
+            return false;
         }
 
         public void setBasic(ILogListener logger, string serialName, BKType bkType, int baudrate = 921600)
