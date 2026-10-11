@@ -227,6 +227,9 @@
     <EmbeddedResource Include="Floaders\BL702Floader_32m.bin" />
     <EmbeddedResource Include="Floaders\W800_Stub.bin" />
     <EmbeddedResource Include="Floaders\W600_UART_Reader.bin" />
+    <EmbeddedResource Include="Floaders\W600_Secboot_1M_V3_3.bin" />
+    <EmbeddedResource Include="Floaders\W600_Secboot_1M_V3_9.bin" />
+    <EmbeddedResource Include="Floaders\W600_Secboot_1M_V3_13.bin" />
     <EmbeddedResource Include="Floaders\XR809_Stub.bin" />
     <EmbeddedResource Include="Floaders\ESP32_Stub.json" />
     <EmbeddedResource Include="Floaders\ESP32S2_Stub.json" />

@@ -49,6 +49,6 @@ R cmp / W cmp - Read/write compression via custom flasher stub; ➖ means not ap
 ² OBK config location is not defined for this platform<br>
 ³ Always writes from `0x0`<br>
 ⁴ Custom reads work, but custom writes still follow the image/partition flow instead of arbitrary raw offsets.<br>
-⁵ W600 backup installs a read-only UART helper by replacing flash sector `0x10000-0x10FFF`; hold PA0 low for installation, then release PA0 and reset when prompted. The saved image therefore contains the helper in that sector. Standalone OBK config writes remain disabled.<br>
+⁵ W600 backup identifies a supported 1 MiB secboot banner over UART0, temporarily replaces secboot sector `0x2000-0x2FFF`, reads the full flash, and reconstructs that sector from the matching embedded secboot so the saved backup retains the detected original version. After a successful read, the SRAM loader returns to Mask ROM and installs V3.13 before completion; an interrupted or failed backup instead restores the detected original secboot. V3.3, V3.9, and V3.13 are catalogued; V3.14 is UART1-only according to the vendor SDK and is not supported by this UART0 reader. Other unknown or 2 MiB banners stop before erase. Manual reset is requested for entry, loader start, and normal boot after restoration or update. Standalone OBK config writes remain disabled.<br>
 ⁶ OBK config reads work, but standalone OBK config writes are not implemented.<br>
 ⁷ RF partition restore and relocation are not defined for this platform.<br>
